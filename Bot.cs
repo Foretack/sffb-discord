@@ -26,6 +26,7 @@ internal sealed class Bot
                     | DiscordIntents.GuildBans
                     | DiscordIntents.GuildMessages
                     | DiscordIntents.MessageContents
+                    | DiscordIntents.Guilds
                     | DiscordIntents.GuildPresences,
             LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
             LargeThreshold = 10000
