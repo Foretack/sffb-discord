@@ -22,8 +22,9 @@ internal static class MemberExtensions
                 userMessages[index++] = message;
             }
             await channel.DeleteMessagesAsync(userMessages);
+            Log.Information("Deleting messages from user {user} in channel {channel}", member.Username, channel.Name);
 
-            ArrayPool<DiscordMessage>.Shared.Return(userMessages);
+            ArrayPool<DiscordMessage>.Shared.Return(userMessages, true);
         }
     }
 }

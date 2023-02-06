@@ -40,6 +40,7 @@ internal sealed class Bot
 
     private Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
+        Log.Verbose("Checking message from {user}: {message}", e.Author.Username, e.Message.Content);
         return FilterHandler.CheckMessage(e);
     }
 }

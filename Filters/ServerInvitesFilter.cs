@@ -35,11 +35,13 @@ internal class ServerInvitesFilter : IFilter
         if (member.Roles?.Select(x => x.Id)?.Any(x => ConfigLoader.BotConfig.WhitelistedRole == x) ?? false)
             return false;
         if (!_inviteRegex.IsMatch(message.Message.Content)) return false;
+
         return true;
     }
 
     public async Task<ActionType> Punish(DiscordMember member)
     {
+        Log.Information("[{header}] Punishing user {user}:{id}", Name, member.Username, member.Id);
         await member.TimeoutAsync(DateTime.Now.AddDays(7), "Posted a Discord invite link");
         return ActionType.Timeout;
     }

@@ -25,10 +25,17 @@ internal sealed class FilterHandler
         {
             if (await filter.CheckContent(message))
             {
+                Log.Information("Message {message} violates filter {fiilter}", message.Message.Content, filter.Name);
+
                 DiscordMember member;
-                if (Bot.MemberCache.ContainsKey(message.Author.Id)) member = Bot.MemberCache[message.Author.Id];
+                if (Bot.MemberCache.ContainsKey(message.Author.Id))
+                {
+                    member = Bot.MemberCache[message.Author.Id];
+                    Log.Debug("Fetched {user} from local cache.");
+                }
                 else
                 {
+                    Log.Debug("User {user} doesn't exist in {cache}. Adding entry", message.Author.Username, nameof(Bot.MemberCache));
                     member = await message.Guild.GetMemberAsync(message.Author.Id);
                     Bot.MemberCache.Add(message.Author.Id, member);
                 }
@@ -48,7 +55,7 @@ internal sealed class FilterHandler
         }
     }
 
-    private void AddFilter(IFilter chatFilter)
+    private static void AddFilter(IFilter chatFilter)
     {
         _filters.Add(chatFilter.Name, chatFilter);
         Log.Debug("Chat filter added: {filter}", chatFilter.Name);
