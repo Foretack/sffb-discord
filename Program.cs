@@ -1,5 +1,6 @@
 ﻿global using Serilog;
 using Serilog.Core;
+using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using SFFBot;
 using SFFBot.Config;
@@ -21,4 +22,13 @@ Redis redis = new();
 Bot bot = new(redis);
 FilterHandler handler = new(redis.Cache);
 
-_ = Console.ReadLine();
+while (true)
+{
+    string? @in = Console.ReadLine();
+    if (string.IsNullOrEmpty(@in)) continue;
+
+    if (Enum.TryParse<LogEventLevel>(@in, out var res))
+    {
+        logSwitch.MinimumLevel = res;
+    }
+}
