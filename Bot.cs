@@ -1,4 +1,5 @@
-﻿using DSharpPlus;
+﻿using System.Collections.Concurrent;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
@@ -7,11 +8,14 @@ using SFFBot.Config;
 namespace SFFBot;
 internal sealed class Bot
 {
+    public static ConcurrentQueue<MessageCreateEventArgs> MessageCache { get; } = new();
     public static Dictionary<ulong, DiscordMember> MemberCache { get; } = new();
 
     public DiscordClient Client { get; init; }
     public IAppConfig Config { get; init; }
     public Redis Redis { get; init; }
+
+    private const int MAX_MESSAGE_CACHE_SIZE = 1024;
 
     public Bot(Redis redisConnection)
     {
@@ -39,9 +43,35 @@ internal sealed class Bot
         Client.MessageCreated += MessageCreated;
     }
 
-    private Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
+    private async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         Log.Verbose("Checking message from {user}: {message}", e.Author.Username, e.Message.Content);
-        return FilterHandler.CheckMessage(e);
+        while (!CacheMessage(e)) await Task.Delay(1000);
+        await FilterHandler.CheckMessage(e);
+    }
+
+    private static bool CacheMessage(MessageCreateEventArgs e)
+    {
+        if (MessageCache.Count < MAX_MESSAGE_CACHE_SIZE)
+        {
+            MessageCache.Enqueue(e);
+            Log.Verbose("Caching message: {user}:{message}",
+                e.Author.Username,
+                e.Message.Content);
+        }
+        else if (!MessageCache.TryDequeue(out _))
+        {
+            Log.Warning("Cache dequeue failed.");
+            return false;
+        }
+        else
+        {
+            Log.Verbose("Replacing cache message");
+            Log.Verbose("Caching message: {user}:{message}",
+                e.Author.Username,
+                e.Message.Content);
+            MessageCache.Enqueue(e);
+        }
+        return true;
     }
 }
