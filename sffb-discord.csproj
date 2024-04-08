@@ -11,8 +11,8 @@
   <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices" Version="7.0.0" />
     <PackageReference Include="CachingFramework.Redis" Version="15.0.2" />
-    <PackageReference Include="Config.Net" Version="5.1.5" />
-    <PackageReference Include="Config.Net.Yaml" Version="5.1.5" />
+    <PackageReference Include="Config.Net" Version="5.2.0" />
+    <PackageReference Include="Config.Net.Yaml" Version="5.2.0" />
     <PackageReference Include="DSharpPlus" Version="4.4.6" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
